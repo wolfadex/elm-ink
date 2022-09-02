@@ -1,0 +1,38 @@
+{
+  "name": "elm-ink",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A very basic template for an [Elm](https://elm-lang.org/) project, using [Nix](https://nixos.org/) and [direnv](https://direnv.net/).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wolfadex/elm-nix.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wolfadex/elm-nix/issues"
+  },
+  "homepage": "https://github.com/wolfadex/elm-nix#readme",
+  "dependencies": {
+    "ansi-escapes": "^5.0.0",
+    "blessed": "^0.1.81",
+    "chalk": "^5.0.1",
+    "cli-boxes": "^3.0.0",
+    "cli-cursor": "^4.0.0",
+    "cli-truncate": "^3.1.0",
+    "patch-console": "^2.0.0",
+    "string-width": "^5.1.2",
+    "termdraw": "^2.0.0",
+    "terminal-kit": "^2.8.10",
+    "widest-line": "^4.0.1",
+    "wrap-ansi": "^8.0.1",
+    "yoga-layout-prebuilt": "^1.10.0"
+  },
+  "devDependencies": {
+    "elm-esm": "^1.1.4"
+  }
+}
