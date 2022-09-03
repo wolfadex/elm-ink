@@ -39,8 +39,12 @@ view userView model =
 inkToHtml : Ink msg -> Html msg
 inkToHtml ink =
     case ink of
-        InkText str ->
-            Html.text str
+        InkText styles str ->
+            inkNode "text-container"
+                [ Html.Attributes.attribute "font" (Ink.Style.encode styles)
+                , Html.Attributes.attribute "text" str
+                ]
+                []
 
         InkInput onInput value ->
             inkNode "textinput"
@@ -51,17 +55,18 @@ inkToHtml ink =
 
         InkColumn styles children ->
             inkNode "column"
-                (List.map Ink.Style.encode styles)
+                [ Html.Attributes.attribute "font" (Ink.Style.encode styles)
+                ]
                 (List.map inkToHtml children)
 
-        InkRow styles children ->
+        InkRow children ->
             inkNode "row"
-                (List.map Ink.Style.encode styles)
+                []
                 (List.map inkToHtml children)
 
-        InkElement styles child ->
+        InkElement child ->
             inkNode "element"
-                (List.map Ink.Style.encode styles)
+                []
                 [ inkToHtml child ]
 
 
@@ -75,14 +80,14 @@ inkNode suffix =
 
 
 type Ink msg
-    = InkText String
+    = InkText (List Style) String
     | InkInput (String -> msg) String
     | InkColumn (List Style) (List (Ink msg))
-    | InkElement (List Style) (Ink msg)
-    | InkRow (List Style) (List (Ink msg))
+    | InkElement (Ink msg)
+    | InkRow (List (Ink msg))
 
 
-text : String -> Ink msg
+text : List Style -> String -> Ink msg
 text =
     InkText
 
@@ -97,6 +102,6 @@ column =
     InkColumn
 
 
-row : List Style -> List (Ink msg) -> Ink msg
+row : List (Ink msg) -> Ink msg
 row =
     InkRow

@@ -5,7 +5,7 @@
   "description": "A very basic template for an [Elm](https://elm-lang.org/) project, using [Nix](https://nixos.org/) and [direnv](https://direnv.net/).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --exec 'elm-esm make src/Main.elm --output=dist/elm.js' --watch src -e elm"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "yoga-layout-prebuilt": "^1.10.0"
   },
   "devDependencies": {
-    "elm-esm": "^1.1.4"
+    "elm-esm": "^1.1.4",
+    "nodemon": "^2.0.19"
   }
 }

@@ -56,20 +56,24 @@ view : Model -> { title : String, body : Ink Msg }
 view model =
     { title = "Elm Ink!"
     , body =
-        -- Ink.column
-        --     --List.map Ink.text model.names ++
-        --     ([ Ink.text "Name:"
-        --      , Ink.input { onChange = GotName, value = model.name }
-        --      ]
-        --         ++ List.map Ink.text model.names
-        --     )
-        -- Ink.text ("Count: " ++ String.fromInt model.num)
         Ink.column
-            [ Ink.Style.setFontColor Ink.Style.Blue
-            , Ink.Style.setBacgroundColor Ink.Style.Black
+            [ Ink.Style.setBacgroundColor Ink.Style.Black
+            , Ink.Style.setFontColor Ink.Style.Cyan
+            , Ink.Style.Bold
             ]
-            [ Ink.text "Hello from Elm Ink!"
-            , Ink.text ""
-            , Ink.text "We're glad you could stop by :)"
+            [ Ink.text [] "Hello!"
+            , Ink.text
+                [ Ink.Style.setBacgroundColor Ink.Style.Yellow
+                , Ink.Style.setFontColor Ink.Style.Black
+                , Ink.Style.Italic
+                ]
+                "Welcome to Elm Ink!"
+            , Ink.text [] ""
+            , Ink.text
+                -- [ Ink.Style.setBacgroundColor Ink.Style.Yellow
+                -- , Ink.Style.setFontColor Ink.Style.Black
+                -- ]
+                []
+                "We're glad you could stop by :)"
             ]
     }

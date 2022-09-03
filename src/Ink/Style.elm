@@ -1,11 +1,10 @@
 module Ink.Style exposing (..)
 
-import Html
-import Html.Attributes
-
 
 type Style
     = Color Location AnsiColor
+    | Bold
+    | Italic
 
 
 type Location
@@ -32,66 +31,70 @@ type alias RGB =
     }
 
 
-encode : Style -> Html.Attribute msg
-encode style =
+encode : List Style -> String
+encode styles =
+    case styles of
+        [] ->
+            ""
+
+        _ ->
+            "\u{001B}[" ++ String.join ";" (List.map encodeStyle styles) ++ "m"
+
+
+encodeStyle : Style -> String
+encodeStyle style =
     case style of
         Color location color ->
-            Html.Attributes.attribute ("style-" ++ locationName location) ("\u{001B}[" ++ encodeColor color (encodeLocation location) ++ "m")
+            (encodeLocation location :: encodeColor color)
+                |> List.map String.fromInt
+                |> String.join ";"
 
+        Bold ->
+            "1"
 
-locationName : Location -> String
-locationName loc =
-    case loc of
-        Foreground ->
-            "foreground"
-
-        Background ->
-            "background"
+        Italic ->
+            "3"
 
 
 encodeLocation : Location -> Int
 encodeLocation loc =
     case loc of
         Foreground ->
-            0
+            38
 
         Background ->
-            10
+            48
 
 
-encodeColor : AnsiColor -> Int -> String
-encodeColor color loc =
+encodeColor : AnsiColor -> List Int
+encodeColor color =
     case color of
         Black ->
-            String.fromInt (30 + loc)
+            [ 2, 0, 0, 0 ]
 
         Red ->
-            String.fromInt (31 + loc)
+            [ 2, 255, 0, 0 ]
 
         Green ->
-            String.fromInt (32 + loc)
+            [ 2, 0, 255, 0 ]
 
         Yellow ->
-            String.fromInt (33 + loc)
+            [ 2, 255, 255, 0 ]
 
         Blue ->
-            String.fromInt (34 + loc)
+            [ 2, 0, 0, 255 ]
 
         Magenta ->
-            String.fromInt (35 + loc)
+            [ 2, 255, 0, 255 ]
 
         Cyan ->
-            String.fromInt (36 + loc)
+            [ 2, 0, 255, 255 ]
 
         White ->
-            String.fromInt (37 + loc)
+            [ 2, 255, 255, 255 ]
 
         Specific col ->
-            String.fromInt (38 + loc)
-                ++ ([ col.red, col.green, col.blue ]
-                        |> List.map String.fromInt
-                        |> String.join ";"
-                   )
+            [ 2, col.red, col.green, col.blue ]
 
 
 setFontColor : AnsiColor -> Style

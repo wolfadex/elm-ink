@@ -5228,63 +5228,75 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $author$project$Ink$Style$encodeColor = F2(
-	function (color, loc) {
-		switch (color.$) {
-			case 'Black':
-				return $elm$core$String$fromInt(30 + loc);
-			case 'Red':
-				return $elm$core$String$fromInt(31 + loc);
-			case 'Green':
-				return $elm$core$String$fromInt(32 + loc);
-			case 'Yellow':
-				return $elm$core$String$fromInt(33 + loc);
-			case 'Blue':
-				return $elm$core$String$fromInt(34 + loc);
-			case 'Magenta':
-				return $elm$core$String$fromInt(35 + loc);
-			case 'Cyan':
-				return $elm$core$String$fromInt(36 + loc);
-			case 'White':
-				return $elm$core$String$fromInt(37 + loc);
-			default:
-				var col = color.a;
-				return _Utils_ap(
-					$elm$core$String$fromInt(38 + loc),
-					A2(
-						$elm$core$String$join,
-						';',
-						A2(
-							$elm$core$List$map,
-							$elm$core$String$fromInt,
-							_List_fromArray(
-								[col.red, col.green, col.blue]))));
-		}
-	});
+var $author$project$Ink$Style$encodeColor = function (color) {
+	switch (color.$) {
+		case 'Black':
+			return _List_fromArray(
+				[2, 0, 0, 0]);
+		case 'Red':
+			return _List_fromArray(
+				[2, 255, 0, 0]);
+		case 'Green':
+			return _List_fromArray(
+				[2, 0, 255, 0]);
+		case 'Yellow':
+			return _List_fromArray(
+				[2, 255, 255, 0]);
+		case 'Blue':
+			return _List_fromArray(
+				[2, 0, 0, 255]);
+		case 'Magenta':
+			return _List_fromArray(
+				[2, 255, 0, 255]);
+		case 'Cyan':
+			return _List_fromArray(
+				[2, 0, 255, 255]);
+		case 'White':
+			return _List_fromArray(
+				[2, 255, 255, 255]);
+		default:
+			var col = color.a;
+			return _List_fromArray(
+				[2, col.red, col.green, col.blue]);
+	}
+};
 var $author$project$Ink$Style$encodeLocation = function (loc) {
 	if (loc.$ === 'Foreground') {
-		return 0;
+		return 38;
 	} else {
-		return 10;
+		return 48;
 	}
 };
-var $author$project$Ink$Style$locationName = function (loc) {
-	if (loc.$ === 'Foreground') {
-		return 'foreground';
-	} else {
-		return 'background';
+var $author$project$Ink$Style$encodeStyle = function (style) {
+	switch (style.$) {
+		case 'Color':
+			var location = style.a;
+			var color = style.b;
+			return A2(
+				$elm$core$String$join,
+				';',
+				A2(
+					$elm$core$List$map,
+					$elm$core$String$fromInt,
+					A2(
+						$elm$core$List$cons,
+						$author$project$Ink$Style$encodeLocation(location),
+						$author$project$Ink$Style$encodeColor(color))));
+		case 'Bold':
+			return '1';
+		default:
+			return '3';
 	}
 };
-var $author$project$Ink$Style$encode = function (style) {
-	var location = style.a;
-	var color = style.b;
-	return A2(
-		$elm$html$Html$Attributes$attribute,
-		'style-' + $author$project$Ink$Style$locationName(location),
-		'\u001B[' + (A2(
-			$author$project$Ink$Style$encodeColor,
-			color,
-			$author$project$Ink$Style$encodeLocation(location)) + 'm'));
+var $author$project$Ink$Style$encode = function (styles) {
+	if (!styles.b) {
+		return '';
+	} else {
+		return '\u001B[' + (A2(
+			$elm$core$String$join,
+			';',
+			A2($elm$core$List$map, $author$project$Ink$Style$encodeStyle, styles)) + 'm');
+	}
 };
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
@@ -5306,8 +5318,6 @@ var $elm$html$Html$Events$on = F2(
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5320,8 +5330,20 @@ var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Ink$inkToHtml = function (ink) {
 	switch (ink.$) {
 		case 'InkText':
-			var str = ink.a;
-			return $elm$html$Html$text(str);
+			var styles = ink.a;
+			var str = ink.b;
+			return A3(
+				$author$project$Ink$inkNode,
+				'text-container',
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$Attributes$attribute,
+						'font',
+						$author$project$Ink$Style$encode(styles)),
+						A2($elm$html$Html$Attributes$attribute, 'text', str)
+					]),
+				_List_Nil);
 		case 'InkInput':
 			var onInput = ink.a;
 			var value = ink.b;
@@ -5343,23 +5365,27 @@ var $author$project$Ink$inkToHtml = function (ink) {
 			return A3(
 				$author$project$Ink$inkNode,
 				'column',
-				A2($elm$core$List$map, $author$project$Ink$Style$encode, styles),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$Attributes$attribute,
+						'font',
+						$author$project$Ink$Style$encode(styles))
+					]),
 				A2($elm$core$List$map, $author$project$Ink$inkToHtml, children));
 		case 'InkRow':
-			var styles = ink.a;
-			var children = ink.b;
+			var children = ink.a;
 			return A3(
 				$author$project$Ink$inkNode,
 				'row',
-				A2($elm$core$List$map, $author$project$Ink$Style$encode, styles),
+				_List_Nil,
 				A2($elm$core$List$map, $author$project$Ink$inkToHtml, children));
 		default:
-			var styles = ink.a;
-			var child = ink.b;
+			var child = ink.a;
 			return A3(
 				$author$project$Ink$inkNode,
 				'element',
-				A2($elm$core$List$map, $author$project$Ink$Style$encode, styles),
+				_List_Nil,
 				_List_fromArray(
 					[
 						$author$project$Ink$inkToHtml(child)
@@ -5830,7 +5856,10 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $author$project$Ink$Style$Black = {$: 'Black'};
-var $author$project$Ink$Style$Blue = {$: 'Blue'};
+var $author$project$Ink$Style$Bold = {$: 'Bold'};
+var $author$project$Ink$Style$Cyan = {$: 'Cyan'};
+var $author$project$Ink$Style$Italic = {$: 'Italic'};
+var $author$project$Ink$Style$Yellow = {$: 'Yellow'};
 var $author$project$Ink$InkColumn = F2(
 	function (a, b) {
 		return {$: 'InkColumn', a: a, b: b};
@@ -5848,9 +5877,10 @@ var $author$project$Ink$Style$Foreground = {$: 'Foreground'};
 var $author$project$Ink$Style$setFontColor = function (color) {
 	return A2($author$project$Ink$Style$Color, $author$project$Ink$Style$Foreground, color);
 };
-var $author$project$Ink$InkText = function (a) {
-	return {$: 'InkText', a: a};
-};
+var $author$project$Ink$InkText = F2(
+	function (a, b) {
+		return {$: 'InkText', a: a, b: b};
+	});
 var $author$project$Ink$text = $author$project$Ink$InkText;
 var $author$project$Main$view = function (model) {
 	return {
@@ -5858,14 +5888,24 @@ var $author$project$Main$view = function (model) {
 			$author$project$Ink$column,
 			_List_fromArray(
 				[
-					$author$project$Ink$Style$setFontColor($author$project$Ink$Style$Blue),
-					$author$project$Ink$Style$setBacgroundColor($author$project$Ink$Style$Black)
+					$author$project$Ink$Style$setBacgroundColor($author$project$Ink$Style$Black),
+					$author$project$Ink$Style$setFontColor($author$project$Ink$Style$Cyan),
+					$author$project$Ink$Style$Bold
 				]),
 			_List_fromArray(
 				[
-					$author$project$Ink$text('Hello from Elm Ink!'),
-					$author$project$Ink$text(''),
-					$author$project$Ink$text('We\'re glad you could stop by :)')
+					A2($author$project$Ink$text, _List_Nil, 'Hello!'),
+					A2(
+					$author$project$Ink$text,
+					_List_fromArray(
+						[
+							$author$project$Ink$Style$setBacgroundColor($author$project$Ink$Style$Yellow),
+							$author$project$Ink$Style$setFontColor($author$project$Ink$Style$Black),
+							$author$project$Ink$Style$Italic
+						]),
+					'Welcome to Elm Ink!'),
+					A2($author$project$Ink$text, _List_Nil, ''),
+					A2($author$project$Ink$text, _List_Nil, 'We\'re glad you could stop by :)')
 				])),
 		title: 'Elm Ink!'
 	};
