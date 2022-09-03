@@ -4,7 +4,10 @@ module Ink.Style exposing (..)
 type Style
     = Color Location AnsiColor
     | Bold
+    | Faint
     | Italic
+    | Underline
+    | Reset
 
 
 type Location
@@ -49,11 +52,20 @@ encodeStyle style =
                 |> List.map String.fromInt
                 |> String.join ";"
 
+        Reset ->
+            "0"
+
         Bold ->
             "1"
 
+        Faint ->
+            "2"
+
         Italic ->
             "3"
+
+        Underline ->
+            "4"
 
 
 encodeLocation : Location -> Int

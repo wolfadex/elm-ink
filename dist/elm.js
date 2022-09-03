@@ -5282,10 +5282,16 @@ var $author$project$Ink$Style$encodeStyle = function (style) {
 						$elm$core$List$cons,
 						$author$project$Ink$Style$encodeLocation(location),
 						$author$project$Ink$Style$encodeColor(color))));
+		case 'Reset':
+			return '0';
 		case 'Bold':
 			return '1';
-		default:
+		case 'Faint':
+			return '2';
+		case 'Italic':
 			return '3';
+		default:
+			return '4';
 	}
 };
 var $author$project$Ink$Style$encode = function (styles) {
