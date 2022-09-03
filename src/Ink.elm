@@ -3,9 +3,8 @@ module Ink exposing (..)
 import Browser
 import Html exposing (Html)
 import Html.Attributes
-import Html.Events
-import Ink.Style exposing (Style)
-import Json.Decode
+import Ink.AnsiColor exposing (AnsiColor, Location(..))
+import Ink.Style exposing (BorderFormat(..), Style(..))
 
 
 program :
@@ -41,34 +40,36 @@ inkToHtml ink =
     case ink of
         InkText styles str ->
             inkNode "text-container"
-                [ Html.Attributes.attribute "font" (Ink.Style.encode styles)
-                , Html.Attributes.attribute "text" str
-                ]
+                (Html.Attributes.attribute "text" str :: unwrapStyles styles)
                 []
 
-        InkInput onInput value ->
-            inkNode "textinput"
-                [ Html.Attributes.value value
-                , Html.Events.on "submit" (Json.Decode.map onInput Json.Decode.string)
-                ]
-                []
-
+        -- InkInput onInput value ->
+        --     inkNode "textinput"
+        --         [ Html.Attributes.value value
+        --         , Html.Events.on "submit" (Json.Decode.map onInput Json.Decode.string)
+        --         ]
+        --         []
         InkColumn styles children ->
             inkNode "column"
-                [ Html.Attributes.attribute "font" (Ink.Style.encode styles)
-                ]
+                (unwrapStyles styles)
                 (List.map inkToHtml children)
 
         InkRow styles children ->
             inkNode "row"
-                [ Html.Attributes.attribute "font" (Ink.Style.encode styles)
-                ]
+                (unwrapStyles styles)
                 (List.map inkToHtml children)
 
-        InkElement child ->
-            inkNode "element"
-                []
-                [ inkToHtml child ]
+
+unwrapStyles : List (Style msg) -> List (Html.Attribute msg)
+unwrapStyles =
+    List.map (\(Style attr) -> attr)
+
+
+
+-- InkElement child ->
+--     inkNode "element"
+--         []
+--         [ inkToHtml child ]
 
 
 inkNode : String -> List (Html.Attribute msg) -> List (Html msg) -> Html msg
@@ -81,28 +82,34 @@ inkNode suffix =
 
 
 type Ink msg
-    = InkText (List Style) String
-    | InkInput (String -> msg) String
-    | InkColumn (List Style) (List (Ink msg))
-    | InkElement (Ink msg)
-    | InkRow (List Style) (List (Ink msg))
+    = InkText (List (Style msg)) String
+      -- | InkInput (String -> msg) String
+    | InkColumn (List (Style msg)) (List (Ink msg))
+      -- | InkElement (Ink msg)
+    | InkRow (List (Style msg)) (List (Ink msg))
 
 
-text : List Style -> String -> Ink msg
+text : List (Style msg) -> String -> Ink msg
 text =
     InkText
 
 
-input : { onChange : String -> msg, value : String } -> Ink msg
-input config =
-    InkInput config.onChange config.value
+
+-- input : { onChange : String -> msg, value : String } -> InkEl msg
+-- input config =
+--     InkInput config.onChange config.value
 
 
-column : List Style -> List (Ink msg) -> Ink msg
+column : List (Style msg) -> List (Ink msg) -> Ink msg
 column =
     InkColumn
 
 
-row : List Style -> List (Ink msg) -> Ink msg
+row : List (Style msg) -> List (Ink msg) -> Ink msg
 row =
     InkRow
+
+
+backgroundColor : AnsiColor -> Style msg
+backgroundColor c =
+    Style (Html.Attributes.attribute "elm-ink-background-color" (Ink.AnsiColor.encode Background c))

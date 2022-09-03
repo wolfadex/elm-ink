@@ -84,10 +84,11 @@ class InkNode {
 
   setAttribute(key, val) {
     this._attributes[key] = val
-    // console.log(key, val)
+
     if (key === 'text') {
       this._yogaNode.setWidth(stringWidth(val))
     }
+
     renderDocument()
   }
 
@@ -155,24 +156,20 @@ class InkNode {
         return drawYogaNode(
           this._yogaNode,
           this._children
-            .map((child) =>
-              applyFontStyle(this._attributes['font'], child.render()),
-            )
+            .map((child) => applyFontStyles(this._attributes, child.render()))
             .join(''),
         )
       case 'elm-ink-row':
         return drawYogaNode(
           this._yogaNode,
           this._children
-            .map((child) =>
-              applyFontStyle(this._attributes['font'], child.render()),
-            )
+            .map((child) => applyFontStyles(this._attributes, child.render()))
             .join(''),
         )
       case 'elm-ink-text-container':
         return drawYogaNode(
           this._yogaNode,
-          applyFontStyle(this._attributes['font'], this._attributes['text']),
+          applyFontStyles(this._attributes, this._attributes['text']),
         )
     }
   }
@@ -188,9 +185,20 @@ function drawYogaNode(yogaNode, content) {
   ].join('')
 }
 
-function applyFontStyle(style, str) {
-  if (style) {
-    return style + str + '\x1B[0m'
+function applyFontStyles(attributes, str) {
+  const styles = [
+    attributes['elm-ink-font-color'],
+    attributes['elm-ink-font-bold'],
+    attributes['elm-ink-font-faint'],
+    attributes['elm-ink-font-italic'],
+    attributes['elm-ink-font-underline'],
+    attributes['elm-ink-background-color'],
+  ]
+    .filter((s) => s)
+    .join(';')
+
+  if (styles) {
+    return '\x1B[' + styles + 'm' + str + '\x1B[0m'
   } else {
     return str
   }

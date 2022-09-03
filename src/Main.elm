@@ -1,6 +1,8 @@
 module Main exposing (main)
 
 import Ink exposing (Ink)
+import Ink.AnsiColor
+import Ink.Font
 import Ink.Style
 import Random exposing (Seed)
 import Time
@@ -84,12 +86,12 @@ view model =
     { title = "Elm Ink!"
     , body =
         Ink.column
-            [ Ink.Style.Bold
+            [ Ink.Font.bold
             ]
             [ Ink.text
-                [ Ink.Style.setBacgroundColor Ink.Style.Yellow
-                , Ink.Style.setFontColor Ink.Style.Black
-                , Ink.Style.Italic
+                [ Ink.backgroundColor Ink.AnsiColor.yellow
+                , Ink.Font.color Ink.AnsiColor.black
+                , Ink.Font.italic
                 ]
                 "Hello!"
             , Ink.row
@@ -98,12 +100,13 @@ view model =
                     []
                     "Welcome to "
                 , Ink.text
-                    [ Ink.Style.setBacgroundColor Ink.Style.Black
-                    , Ink.Style.setFontColor Ink.Style.Cyan
+                    [ Ink.backgroundColor Ink.AnsiColor.black
+                    , Ink.Font.color Ink.AnsiColor.cyan
+                    , Ink.Font.underline
                     ]
                     "Elm Ink"
                 ]
             , Ink.text [] ""
-            , Ink.text [] model.phrase
+            , Ink.text [ Ink.Font.faint ] model.phrase
             ]
     }
