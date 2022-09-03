@@ -59,9 +59,10 @@ inkToHtml ink =
                 ]
                 (List.map inkToHtml children)
 
-        InkRow children ->
+        InkRow styles children ->
             inkNode "row"
-                []
+                [ Html.Attributes.attribute "font" (Ink.Style.encode styles)
+                ]
                 (List.map inkToHtml children)
 
         InkElement child ->
@@ -84,7 +85,7 @@ type Ink msg
     | InkInput (String -> msg) String
     | InkColumn (List Style) (List (Ink msg))
     | InkElement (Ink msg)
-    | InkRow (List (Ink msg))
+    | InkRow (List Style) (List (Ink msg))
 
 
 text : List Style -> String -> Ink msg
@@ -102,6 +103,6 @@ column =
     InkColumn
 
 
-row : List (Ink msg) -> Ink msg
+row : List Style -> List (Ink msg) -> Ink msg
 row =
     InkRow

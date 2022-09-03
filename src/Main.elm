@@ -2,10 +2,11 @@ module Main exposing (main)
 
 import Ink exposing (Ink)
 import Ink.Style
+import Random exposing (Seed)
 import Time
 
 
-main : Program () Model Msg
+main : Program Int Model Msg
 main =
     Ink.program
         { init = init
@@ -16,17 +17,33 @@ main =
 
 
 type alias Model =
-    { name : String
-    , names : List String
-    , num : Int
+    { phrase : String
+    , seed : Seed
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
-    ( { name = ""
-      , names = []
-      , num = 0
+phrases : ( String, List String )
+phrases =
+    ( "We're glad you could join us :)"
+    , [ "Get ready for some fun!"
+      , "An Elm package for TUIs"
+      ]
+    )
+
+
+init : Int -> ( Model, Cmd Msg )
+init initialSeed =
+    let
+        ( first, rest ) =
+            phrases
+
+        ( phrase, seed ) =
+            Random.step
+                (Random.uniform first rest)
+                (Random.initialSeed initialSeed)
+    in
+    ( { phrase = phrase
+      , seed = seed
       }
     , Cmd.none
     )
@@ -34,22 +51,32 @@ init () =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Time.every 1000 (\_ -> Tick)
+    Time.every 2000 (\_ -> Tick)
 
 
 type Msg
-    = GotName String
-    | Tick
+    = Tick
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotName name ->
-            ( { model | names = name :: model.names }, Cmd.none )
-
         Tick ->
-            ( { model | num = model.num + 1 }, Cmd.none )
+            let
+                ( first, rest ) =
+                    phrases
+
+                ( phrase, seed ) =
+                    Random.step
+                        (Random.uniform first rest)
+                        model.seed
+            in
+            ( { model
+                | phrase = phrase
+                , seed = seed
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> { title : String, body : Ink Msg }
@@ -57,23 +84,26 @@ view model =
     { title = "Elm Ink!"
     , body =
         Ink.column
-            [ Ink.Style.setBacgroundColor Ink.Style.Black
-            , Ink.Style.setFontColor Ink.Style.Cyan
-            , Ink.Style.Bold
+            [ Ink.Style.Bold
             ]
-            [ Ink.text [] "Hello!"
-            , Ink.text
+            [ Ink.text
                 [ Ink.Style.setBacgroundColor Ink.Style.Yellow
                 , Ink.Style.setFontColor Ink.Style.Black
                 , Ink.Style.Italic
                 ]
-                "Welcome to Elm Ink!"
-            , Ink.text [] ""
-            , Ink.text
-                -- [ Ink.Style.setBacgroundColor Ink.Style.Yellow
-                -- , Ink.Style.setFontColor Ink.Style.Black
-                -- ]
+                "Hello!"
+            , Ink.row
                 []
-                "We're glad you could stop by :)"
+                [ Ink.text
+                    []
+                    "Welcome to "
+                , Ink.text
+                    [ Ink.Style.setBacgroundColor Ink.Style.Black
+                    , Ink.Style.setFontColor Ink.Style.Cyan
+                    ]
+                    "Elm Ink"
+                ]
+            , Ink.text [] ""
+            , Ink.text [] model.phrase
             ]
     }

@@ -38,6 +38,10 @@ class InkNode {
         this._yogaNode = yoga.Node.create()
         this._yogaNode.setFlexDirection(yoga.FLEX_DIRECTION_COLUMN)
         break
+      case 'elm-ink-row':
+        this._yogaNode = yoga.Node.create()
+        this._yogaNode.setFlexDirection(yoga.FLEX_DIRECTION_ROW)
+        break
       case 'elm-ink-textinput':
         break
       case 'elm-ink-text-container':
@@ -80,10 +84,11 @@ class InkNode {
 
   setAttribute(key, val) {
     this._attributes[key] = val
-
+    // console.log(key, val)
     if (key === 'text') {
       this._yogaNode.setWidth(stringWidth(val))
     }
+    renderDocument()
   }
 
   // addEventListener(key, callback) {
@@ -92,11 +97,8 @@ class InkNode {
 
   appendChild(node) {
     this._children.push(node)
-    // console.log("node", node);
     this._yogaNode.insertChild(node._yogaNode, this._yogaNode.getChildCount())
-    // console.log("append", this._type, this._yogaNode.getChild(0));
     node._parent = this
-    // console.log("this?\n\n", globalThis.document.body, "\n\n", this);
     renderDocument()
   }
 
@@ -138,9 +140,9 @@ class InkNode {
 
   render() {
     switch (this._type) {
-      case 'TEXT':
-        const rect = this._yogaNode.getComputedLayout()
-        return [ansiEscapes.cursorTo(rect.left, rect.top), this._data].join('')
+      // case 'TEXT':
+      //   rect = this._yogaNode.getComputedLayout()
+      //   return [ansiEscapes.cursorTo(rect.left, rect.top), this._data].join('')
       case 'body':
         this._yogaNode.setJustifyContent(yoga.JUSTIFY_CENTER)
         this._yogaNode.calculateLayout(
@@ -148,23 +150,42 @@ class InkNode {
           process.stdout.rows,
           yoga.DIRECTION_LTR,
         )
-        console.log(this._type, this._yogaNode.getComputedLayout())
         return this._children.reduce((res, child) => res + child.render(), '')
       case 'elm-ink-column':
-        console.log(this._type, this._yogaNode.getComputedLayout())
-        return this._children
-          .map((child) =>
-            applyFontStyle(this._attributes['font'], child.render()),
-          )
-          .join('')
+        return drawYogaNode(
+          this._yogaNode,
+          this._children
+            .map((child) =>
+              applyFontStyle(this._attributes['font'], child.render()),
+            )
+            .join(''),
+        )
+      case 'elm-ink-row':
+        return drawYogaNode(
+          this._yogaNode,
+          this._children
+            .map((child) =>
+              applyFontStyle(this._attributes['font'], child.render()),
+            )
+            .join(''),
+        )
       case 'elm-ink-text-container':
-        console.log(this._type, this._yogaNode.getComputedLayout())
-        return applyFontStyle(
-          this._attributes['font'],
-          this._attributes['text'],
+        return drawYogaNode(
+          this._yogaNode,
+          applyFontStyle(this._attributes['font'], this._attributes['text']),
         )
     }
   }
+}
+
+function drawYogaNode(yogaNode, content) {
+  var rect = yogaNode.getComputedLayout()
+  return [
+    ansiEscapes.cursorSavePosition,
+    ansiEscapes.cursorMove(rect.left, rect.top),
+    content,
+    ansiEscapes.cursorRestorePosition,
+  ].join('')
 }
 
 function applyFontStyle(style, str) {
@@ -209,6 +230,7 @@ function renderDocument() {
   var output = [
     ansiEscapes.cursorHide,
     ansiEscapes.clearScreen,
+    ansiEscapes.cursorTo(0, 0),
     globalThis.document.body.render(),
   ].join('')
 
