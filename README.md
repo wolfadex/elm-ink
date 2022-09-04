@@ -1,6 +1,6 @@
 # Elm-Ink
 
-An Elm package (plus JS package) for writing apps for your terminal.
+An Elm (plus JS) package for writing apps for your terminal.
 
 ## Getting Started
 

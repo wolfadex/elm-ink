@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Ink exposing (Ink)
 import Ink.AnsiColor
@@ -21,6 +21,7 @@ main =
 type alias Model =
     { phrase : String
     , seed : Seed
+    , input : String
     }
 
 
@@ -46,6 +47,7 @@ init initialSeed =
     in
     ( { phrase = phrase
       , seed = seed
+      , input = ""
       }
     , Cmd.none
     )
@@ -53,11 +55,21 @@ init initialSeed =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Time.every 2000 (\_ -> Tick)
+    Sub.batch
+        [ Time.every 2000 (\_ -> Tick)
+        , stdin Stdin
+        ]
+
+
+port stdin : (String -> msg) -> Sub msg
+
+
+port logFile : String -> Cmd msg
 
 
 type Msg
     = Tick
+    | Stdin String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -76,6 +88,19 @@ update msg model =
             ( { model
                 | phrase = phrase
                 , seed = seed
+              }
+            , Cmd.none
+            )
+
+        Stdin str ->
+            ( { model
+                | input =
+                    -- Delete or Backspace (not sure about forward delete)
+                    if str == "\u{007F}" || str == "\u{0008}" then
+                        String.dropRight 1 model.input
+
+                    else
+                        model.input ++ str
               }
             , Cmd.none
             )
@@ -115,5 +140,8 @@ view model =
                 , Ink.Border.backgroundColor Ink.AnsiColor.blue
                 ]
                 model.phrase
+            , Ink.text
+                []
+                model.input
             ]
     }

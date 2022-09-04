@@ -1,20 +1,6 @@
 import ansiEscapes from 'ansi-escapes'
 import yoga from 'yoga-layout-prebuilt'
 import stringWidth from 'string-width'
-import cliBoxes from 'cli-boxes'
-
-process.stdin.setRawMode(true)
-process.stdin.resume()
-process.stdin.setEncoding('utf-8')
-var val
-process.stdin.on('data', function (data) {
-  val = data.toString()
-
-  if (val === '\x1B' || val === '\u0003') {
-    process.stdin.setRawMode(true)
-    process.exit(0)
-  }
-})
 
 // An Ink <-> Blessed node wrapper
 class InkNode {
@@ -330,8 +316,6 @@ class InkDocument {
   }
 }
 
-globalThis.document = new InkDocument()
-
 function renderDocument() {
   var output = [
     ansiEscapes.cursorHide,
@@ -346,3 +330,32 @@ function renderDocument() {
 function arrayOfSize(size) {
   return new Array(size).fill(null)
 }
+
+globalThis.document = new InkDocument()
+
+process.stdin.setRawMode(true)
+process.stdin.resume()
+process.stdin.setEncoding('utf-8')
+
+function subscribeToStdin(stdinCallback) {
+  process.stdin.on('data', function (data) {
+    if (stdinCallback) {
+      stdinCallback(data.toString())
+    } else {
+      const val = data.toString()
+      // Assume the user isn't listening to stdin and
+      // let them close the app with Esc of Ctrl+c
+      if (val === '\x1B' || val === '\u0003') {
+        process.stdin.setRawMode(true)
+        process.exit(0)
+      }
+    }
+  })
+}
+
+function exit() {
+  process.stdin.setRawMode(true)
+  process.exit(0)
+}
+
+export { subscribeToStdin, exit }

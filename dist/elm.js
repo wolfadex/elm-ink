@@ -5148,7 +5148,7 @@ var $author$project$Main$init = function (initialSeed) {
 	var phrase = _v1.a;
 	var seed = _v1.b;
 	return _Utils_Tuple2(
-		{phrase: phrase, seed: seed},
+		{input: '', phrase: phrase, seed: seed},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5466,7 +5466,11 @@ var $author$project$Ink$program = function (config) {
 			view: $author$project$Ink$view(config.view)
 		});
 };
+var $author$project$Main$Stdin = function (a) {
+	return {$: 'Stdin', a: a};
+};
 var $author$project$Main$Tick = {$: 'Tick'};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -5882,30 +5886,52 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$stdin = _Platform_incomingPort('stdin', $elm$json$Json$Decode$string);
 var $author$project$Main$subscriptions = function (_v0) {
-	return A2(
-		$elm$time$Time$every,
-		2000,
-		function (_v1) {
-			return $author$project$Main$Tick;
-		});
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				A2(
+				$elm$time$Time$every,
+				2000,
+				function (_v1) {
+					return $author$project$Main$Tick;
+				}),
+				$author$project$Main$stdin($author$project$Main$Stdin)
+			]));
 };
+var $elm$core$String$dropRight = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3($elm$core$String$slice, 0, -n, string);
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		var _v1 = $author$project$Main$phrases;
-		var first = _v1.a;
-		var rest = _v1.b;
-		var _v2 = A2(
-			$elm$random$Random$step,
-			A2($elm$random$Random$uniform, first, rest),
-			model.seed);
-		var phrase = _v2.a;
-		var seed = _v2.b;
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{phrase: phrase, seed: seed}),
-			$elm$core$Platform$Cmd$none);
+		if (msg.$ === 'Tick') {
+			var _v1 = $author$project$Main$phrases;
+			var first = _v1.a;
+			var rest = _v1.b;
+			var _v2 = A2(
+				$elm$random$Random$step,
+				A2($elm$random$Random$uniform, first, rest),
+				model.seed);
+			var phrase = _v2.a;
+			var seed = _v2.b;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{phrase: phrase, seed: seed}),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			var str = msg.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						input: ((str === '\u007F') || (str === '\u0008')) ? A2($elm$core$String$dropRight, 1, model.input) : _Utils_ap(model.input, str)
+					}),
+				$elm$core$Platform$Cmd$none);
+		}
 	});
 var $author$project$Ink$AnsiColor$Background = {$: 'Background'};
 var $author$project$Internal$Style = function (a) {
@@ -6115,7 +6141,8 @@ var $author$project$Main$view = function (model) {
 							$author$project$Ink$Border$double,
 							$author$project$Ink$Border$backgroundColor($author$project$Ink$AnsiColor$blue)
 						]),
-					model.phrase)
+					model.phrase),
+					A2($author$project$Ink$text, _List_Nil, model.input)
 				])),
 		title: 'Elm Ink!'
 	};
