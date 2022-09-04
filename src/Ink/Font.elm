@@ -2,7 +2,7 @@ module Ink.Font exposing (..)
 
 import Html.Attributes
 import Ink.AnsiColor exposing (AnsiColor, Location(..))
-import Ink.Style exposing (Style(..))
+import Internal exposing (Style(..))
 
 
 color : AnsiColor -> Style msg

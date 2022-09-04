@@ -5908,7 +5908,7 @@ var $author$project$Main$update = F2(
 			$elm$core$Platform$Cmd$none);
 	});
 var $author$project$Ink$AnsiColor$Background = {$: 'Background'};
-var $author$project$Ink$Style$Style = function (a) {
+var $author$project$Internal$Style = function (a) {
 	return {$: 'Style', a: a};
 };
 var $author$project$Ink$AnsiColor$encodeLocation = function (loc) {
@@ -5937,7 +5937,7 @@ var $author$project$Ink$AnsiColor$encode = F2(
 					])));
 	});
 var $author$project$Ink$backgroundColor = function (c) {
-	return $author$project$Ink$Style$Style(
+	return $author$project$Internal$Style(
 		A2(
 			$elm$html$Html$Attributes$attribute,
 			'elm-ink-background-color',
@@ -5948,11 +5948,18 @@ var $author$project$Internal$AnsiColor = function (a) {
 };
 var $author$project$Ink$AnsiColor$black = $author$project$Internal$AnsiColor(
 	{blue: 0, green: 0, red: 0});
-var $author$project$Ink$Font$bold = $author$project$Ink$Style$Style(
+var $author$project$Ink$Font$bold = $author$project$Internal$Style(
 	A2($elm$html$Html$Attributes$attribute, 'elm-ink-font-bold', '1'));
 var $author$project$Ink$AnsiColor$Foreground = {$: 'Foreground'};
+var $author$project$Ink$Border$color = function (c) {
+	return $author$project$Internal$Style(
+		A2(
+			$elm$html$Html$Attributes$attribute,
+			'elm-ink-border-color',
+			A2($author$project$Ink$AnsiColor$encode, $author$project$Ink$AnsiColor$Foreground, c)));
+};
 var $author$project$Ink$Font$color = function (c) {
-	return $author$project$Ink$Style$Style(
+	return $author$project$Internal$Style(
 		A2(
 			$elm$html$Html$Attributes$attribute,
 			'elm-ink-font-color',
@@ -5965,21 +5972,93 @@ var $author$project$Ink$InkColumn = F2(
 var $author$project$Ink$column = $author$project$Ink$InkColumn;
 var $author$project$Ink$AnsiColor$cyan = $author$project$Internal$AnsiColor(
 	{blue: 255, green: 255, red: 0});
-var $author$project$Ink$Font$faint = $author$project$Ink$Style$Style(
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Tuple$mapSecond = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
+	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $elm$virtual_dom$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlJson(value));
+	});
+var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Ink$Border$encode = A2(
+	$elm$core$Basics$composeR,
+	$elm$core$List$map(
+		$elm$core$Tuple$mapSecond($elm$json$Json$Encode$string)),
+	A2(
+		$elm$core$Basics$composeR,
+		$elm$json$Json$Encode$object,
+		A2(
+			$elm$core$Basics$composeR,
+			$elm$html$Html$Attributes$property('elmInkBorderFormat'),
+			$author$project$Internal$Style)));
+var $author$project$Ink$Border$double = $author$project$Ink$Border$encode(
+	_List_fromArray(
+		[
+			_Utils_Tuple2('topLeft', '╔'),
+			_Utils_Tuple2('top', '═'),
+			_Utils_Tuple2('topRight', '╗'),
+			_Utils_Tuple2('right', '║'),
+			_Utils_Tuple2('bottomRight', '╝'),
+			_Utils_Tuple2('bottom', '═'),
+			_Utils_Tuple2('bottomLeft', '╚'),
+			_Utils_Tuple2('left', '║')
+		]));
+var $author$project$Ink$Font$faint = $author$project$Internal$Style(
 	A2($elm$html$Html$Attributes$attribute, 'elm-ink-font-faint', '2'));
-var $author$project$Ink$Font$italic = $author$project$Ink$Style$Style(
+var $author$project$Ink$Font$italic = $author$project$Internal$Style(
 	A2($elm$html$Html$Attributes$attribute, 'elm-ink-font-italic', '3'));
+var $author$project$Ink$AnsiColor$red = $author$project$Internal$AnsiColor(
+	{blue: 0, green: 0, red: 255});
 var $author$project$Ink$InkRow = F2(
 	function (a, b) {
 		return {$: 'InkRow', a: a, b: b};
 	});
 var $author$project$Ink$row = $author$project$Ink$InkRow;
+var $author$project$Ink$Border$single = $author$project$Ink$Border$encode(
+	_List_fromArray(
+		[
+			_Utils_Tuple2('topLeft', '┌'),
+			_Utils_Tuple2('top', '─'),
+			_Utils_Tuple2('topRight', '┐'),
+			_Utils_Tuple2('right', '│'),
+			_Utils_Tuple2('bottomRight', '┘'),
+			_Utils_Tuple2('bottom', '─'),
+			_Utils_Tuple2('bottomLeft', '└'),
+			_Utils_Tuple2('left', '│')
+		]));
 var $author$project$Ink$InkText = F2(
 	function (a, b) {
 		return {$: 'InkText', a: a, b: b};
 	});
 var $author$project$Ink$text = $author$project$Ink$InkText;
-var $author$project$Ink$Font$underline = $author$project$Ink$Style$Style(
+var $author$project$Ink$Font$underline = $author$project$Internal$Style(
 	A2($elm$html$Html$Attributes$attribute, 'elm-ink-font-underline', '4'));
 var $author$project$Ink$AnsiColor$yellow = $author$project$Internal$AnsiColor(
 	{blue: 0, green: 255, red: 255});
@@ -6012,7 +6091,9 @@ var $author$project$Main$view = function (model) {
 								[
 									$author$project$Ink$backgroundColor($author$project$Ink$AnsiColor$black),
 									$author$project$Ink$Font$color($author$project$Ink$AnsiColor$cyan),
-									$author$project$Ink$Font$underline
+									$author$project$Ink$Font$underline,
+									$author$project$Ink$Border$single,
+									$author$project$Ink$Border$color($author$project$Ink$AnsiColor$red)
 								]),
 							'Elm Ink')
 						])),
@@ -6020,7 +6101,7 @@ var $author$project$Main$view = function (model) {
 					A2(
 					$author$project$Ink$text,
 					_List_fromArray(
-						[$author$project$Ink$Font$faint]),
+						[$author$project$Ink$Font$faint, $author$project$Ink$Border$double]),
 					model.phrase)
 				])),
 		title: 'Elm Ink!'

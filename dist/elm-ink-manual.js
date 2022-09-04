@@ -139,50 +139,145 @@ class InkNode {
 
   // Custom stuff
 
+  set elmInkBorderFormat(format) {
+    this._borderFormat = format
+    this._yogaNode.setBorder(yoga.EDGE_ALL, 1)
+
+    function addBorder(node) {
+      node._yogaNode.setHeight(node._yogaNode.getHeight() + 2)
+      node._yogaNode.setWidth(node._yogaNode.getWidth() + 2)
+      if (node.parentNode) {
+        addBorder(node.parentNode)
+      }
+    }
+
+    if (this._type === 'elm-ink-text-container') {
+      addBorder(this)
+    }
+
+    renderDocument()
+  }
+
   render() {
     switch (this._type) {
       // case 'TEXT':
       //   rect = this._yogaNode.getComputedLayout()
       //   return [ansiEscapes.cursorTo(rect.left, rect.top), this._data].join('')
       case 'body':
-        this._yogaNode.setJustifyContent(yoga.JUSTIFY_CENTER)
+        // this._yogaNode.setJustifyContent(yoga.JUSTIFY_CENTER)
         this._yogaNode.calculateLayout(
           process.stdout.columns,
           process.stdout.rows,
           yoga.DIRECTION_LTR,
         )
+        // var rect = this._yogaNode.getComputedLayout()
+        // console.log(rect, 'body')
         return this._children.reduce((res, child) => res + child.render(), '')
       case 'elm-ink-column':
-        return drawYogaNode(
-          this._yogaNode,
-          this._children
-            .map((child) => applyFontStyles(this._attributes, child.render()))
-            .join(''),
+        return (
+          drawBorder(this._attributes, this._borderFormat, this._yogaNode) +
+          drawYogaNode(
+            this._yogaNode,
+            this._borderFormat,
+
+            this._children
+              .map((child) => applyFontStyles(this._attributes, child.render()))
+              .join(''),
+          )
         )
       case 'elm-ink-row':
-        return drawYogaNode(
-          this._yogaNode,
-          this._children
-            .map((child) => applyFontStyles(this._attributes, child.render()))
-            .join(''),
+        return (
+          drawBorder(this._attributes, this._borderFormat, this._yogaNode) +
+          drawYogaNode(
+            this._yogaNode,
+            this._borderFormat,
+
+            this._children
+              .map((child) => applyFontStyles(this._attributes, child.render()))
+              .join(''),
+          )
         )
       case 'elm-ink-text-container':
-        return drawYogaNode(
-          this._yogaNode,
-          applyFontStyles(this._attributes, this._attributes['text']),
+        return (
+          drawBorder(this._attributes, this._borderFormat, this._yogaNode) +
+          drawYogaNode(
+            this._yogaNode,
+            this._borderFormat,
+
+            applyFontStyles(this._attributes, this._attributes['text']),
+          )
         )
     }
   }
 }
 
-function drawYogaNode(yogaNode, content) {
+function drawYogaNode(yogaNode, border, content) {
   var rect = yogaNode.getComputedLayout()
+  console.log(rect)
   return [
     ansiEscapes.cursorSavePosition,
-    ansiEscapes.cursorMove(rect.left, rect.top),
+    ansiEscapes.cursorMove(
+      border ? rect.left + 1 : rect.left,
+      border ? rect.top + 1 : rect.top,
+    ),
     content,
     ansiEscapes.cursorRestorePosition,
   ].join('')
+}
+
+function drawBorder(attributes, format, yogaNode) {
+  if (format) {
+    const styles = [
+      attributes['elm-ink-border-color'],
+      attributes['elm-ink-border-background-color'],
+    ]
+      .filter((s) => s)
+      .join(';')
+    function applyStyleToBorder(str) {
+      if (styles) {
+        return '\x1B[' + styles + 'm' + str + '\x1B[0m'
+      } else {
+        return str
+      }
+    }
+
+    var rect = yogaNode.getComputedLayout()
+
+    return [
+      ansiEscapes.cursorSavePosition,
+      ansiEscapes.cursorMove(rect.left, rect.top),
+      applyStyleToBorder(format.topLeft),
+      applyStyleToBorder(format.top.repeat(rect.width - 2)),
+      applyStyleToBorder(format.topRight),
+      arrayOfSize(rect.height - 2)
+        .map(() =>
+          [
+            ansiEscapes.cursorBackward(1),
+            ansiEscapes.cursorDown(1),
+            applyStyleToBorder(format.right),
+          ].join(''),
+        )
+        .join(''),
+      ansiEscapes.cursorDown(1),
+      ansiEscapes.cursorBackward(rect.width),
+      applyStyleToBorder(format.bottomLeft),
+      applyStyleToBorder(format.bottom.repeat(rect.width - 2)),
+      applyStyleToBorder(format.bottomRight),
+      ansiEscapes.cursorBackward(rect.width - 1),
+      arrayOfSize(rect.height - 2)
+        .map(() =>
+          [
+            ansiEscapes.cursorBackward(1),
+            ansiEscapes.cursorUp(1),
+            applyStyleToBorder(format.left),
+          ].join(''),
+        )
+        .join(''),
+      ansiEscapes.cursorRestorePosition,
+    ].join('')
+  } else {
+    return ''
+  }
 }
 
 function applyFontStyles(attributes, str) {
@@ -243,4 +338,8 @@ function renderDocument() {
   ].join('')
 
   process.stdout.write(output)
+}
+
+function arrayOfSize(size) {
+  return new Array(size).fill(null)
 }

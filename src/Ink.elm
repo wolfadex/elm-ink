@@ -4,7 +4,7 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Ink.AnsiColor exposing (AnsiColor, Location(..))
-import Ink.Style exposing (BorderFormat(..), Style(..))
+import Internal exposing (Style(..))
 
 
 program :
@@ -79,6 +79,10 @@ inkNode suffix =
 
 
 ---- UI PIECES ----
+
+
+type alias Style msg =
+    Internal.Style msg
 
 
 type Ink msg

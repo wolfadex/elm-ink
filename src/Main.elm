@@ -2,8 +2,8 @@ module Main exposing (main)
 
 import Ink exposing (Ink)
 import Ink.AnsiColor
+import Ink.Border
 import Ink.Font
-import Ink.Style
 import Random exposing (Seed)
 import Time
 
@@ -103,10 +103,37 @@ view model =
                     [ Ink.backgroundColor Ink.AnsiColor.black
                     , Ink.Font.color Ink.AnsiColor.cyan
                     , Ink.Font.underline
+                    , Ink.Border.single
+                    , Ink.Border.color Ink.AnsiColor.red
                     ]
                     "Elm Ink"
                 ]
             , Ink.text [] ""
-            , Ink.text [ Ink.Font.faint ] model.phrase
+            , Ink.text
+                [ Ink.Font.faint
+                , Ink.Border.double
+                ]
+                model.phrase
             ]
+
+    -- Ink.row
+    --     []
+    --     [ Ink.text
+    --         []
+    --         "Hello"
+    --     , Ink.text
+    --         [ Ink.backgroundColor Ink.AnsiColor.black
+    --         , Ink.Font.color Ink.AnsiColor.cyan
+    --         , Ink.Border.single
+    --         , Ink.Border.color Ink.AnsiColor.red
+    --         ]
+    --         "Elm Ink"
+    --     ]
+    -- Ink.text
+    --     [ Ink.backgroundColor Ink.AnsiColor.black
+    --     , Ink.Font.color Ink.AnsiColor.cyan
+    --     , Ink.Border.single
+    --     , Ink.Border.color Ink.AnsiColor.red
+    --     ]
+    --     "Elm Ink"
     }
