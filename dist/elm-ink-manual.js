@@ -46,7 +46,6 @@ class InkNode {
         break
       case 'elm-ink-text-container':
         this._yogaNode = yoga.Node.create()
-        this._yogaNode.setHeight(1)
         break
       default:
         console.log('UNKNOWN NODE TYPE', type)
@@ -87,6 +86,8 @@ class InkNode {
 
     if (key === 'text') {
       this._yogaNode.setWidth(stringWidth(val))
+      this._yogaNode.setHeight(1)
+      padBorder(this)
     }
 
     renderDocument()
@@ -143,16 +144,13 @@ class InkNode {
     this._borderFormat = format
     this._yogaNode.setBorder(yoga.EDGE_ALL, 1)
 
-    function addBorder(node) {
-      node._yogaNode.setHeight(node._yogaNode.getHeight() + 2)
-      node._yogaNode.setWidth(node._yogaNode.getWidth() + 2)
-      if (node.parentNode) {
-        addBorder(node.parentNode)
-      }
-    }
-
     if (this._type === 'elm-ink-text-container') {
-      addBorder(this)
+      if (this._attributes['text']) {
+        this._yogaNode.setWidth(stringWidth(this._attributes['text']))
+      }
+
+      this._yogaNode.setHeight(1)
+      padBorder(this)
     }
 
     renderDocument()
@@ -170,8 +168,6 @@ class InkNode {
           process.stdout.rows,
           yoga.DIRECTION_LTR,
         )
-        // var rect = this._yogaNode.getComputedLayout()
-        // console.log(rect, 'body')
         return this._children.reduce((res, child) => res + child.render(), '')
       case 'elm-ink-column':
         return (
@@ -211,9 +207,16 @@ class InkNode {
   }
 }
 
+function padBorder(node) {
+  node._yogaNode.setHeight(node._yogaNode.getHeight() + 2)
+  node._yogaNode.setWidth(node._yogaNode.getWidth() + 2)
+  if (node.parentNode) {
+    padBorder(node.parentNode)
+  }
+}
+
 function drawYogaNode(yogaNode, border, content) {
   var rect = yogaNode.getComputedLayout()
-  console.log(rect)
   return [
     ansiEscapes.cursorSavePosition,
     ansiEscapes.cursorMove(

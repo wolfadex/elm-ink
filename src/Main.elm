@@ -112,28 +112,8 @@ view model =
             , Ink.text
                 [ Ink.Font.faint
                 , Ink.Border.double
+                , Ink.Border.backgroundColor Ink.AnsiColor.blue
                 ]
                 model.phrase
             ]
-
-    -- Ink.row
-    --     []
-    --     [ Ink.text
-    --         []
-    --         "Hello"
-    --     , Ink.text
-    --         [ Ink.backgroundColor Ink.AnsiColor.black
-    --         , Ink.Font.color Ink.AnsiColor.cyan
-    --         , Ink.Border.single
-    --         , Ink.Border.color Ink.AnsiColor.red
-    --         ]
-    --         "Elm Ink"
-    --     ]
-    -- Ink.text
-    --     [ Ink.backgroundColor Ink.AnsiColor.black
-    --     , Ink.Font.color Ink.AnsiColor.cyan
-    --     , Ink.Border.single
-    --     , Ink.Border.color Ink.AnsiColor.red
-    --     ]
-    --     "Elm Ink"
     }

@@ -5943,11 +5943,20 @@ var $author$project$Ink$backgroundColor = function (c) {
 			'elm-ink-background-color',
 			A2($author$project$Ink$AnsiColor$encode, $author$project$Ink$AnsiColor$Background, c)));
 };
+var $author$project$Ink$Border$backgroundColor = function (c) {
+	return $author$project$Internal$Style(
+		A2(
+			$elm$html$Html$Attributes$attribute,
+			'elm-ink-border-background-color',
+			A2($author$project$Ink$AnsiColor$encode, $author$project$Ink$AnsiColor$Background, c)));
+};
 var $author$project$Internal$AnsiColor = function (a) {
 	return {$: 'AnsiColor', a: a};
 };
 var $author$project$Ink$AnsiColor$black = $author$project$Internal$AnsiColor(
 	{blue: 0, green: 0, red: 0});
+var $author$project$Ink$AnsiColor$blue = $author$project$Internal$AnsiColor(
+	{blue: 255, green: 0, red: 0});
 var $author$project$Ink$Font$bold = $author$project$Internal$Style(
 	A2($elm$html$Html$Attributes$attribute, 'elm-ink-font-bold', '1'));
 var $author$project$Ink$AnsiColor$Foreground = {$: 'Foreground'};
@@ -6101,7 +6110,11 @@ var $author$project$Main$view = function (model) {
 					A2(
 					$author$project$Ink$text,
 					_List_fromArray(
-						[$author$project$Ink$Font$faint, $author$project$Ink$Border$double]),
+						[
+							$author$project$Ink$Font$faint,
+							$author$project$Ink$Border$double,
+							$author$project$Ink$Border$backgroundColor($author$project$Ink$AnsiColor$blue)
+						]),
 					model.phrase)
 				])),
 		title: 'Elm Ink!'

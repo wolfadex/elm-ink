@@ -204,7 +204,7 @@ color c =
 
 backgroundColor : AnsiColor -> Style msg
 backgroundColor c =
-    Style (Html.Attributes.attribute "elm-ink-border-background-color" (Ink.AnsiColor.encode Foreground c))
+    Style (Html.Attributes.attribute "elm-ink-border-background-color" (Ink.AnsiColor.encode Background c))
 
 
 
