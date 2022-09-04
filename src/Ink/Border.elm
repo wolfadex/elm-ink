@@ -1,7 +1,7 @@
 module Ink.Border exposing
     ( single
     , double
-    , backgroundColor, bold, classic, color, doubleSingle, rounded, singleDouble
+    , backgroundColor, bold, classic, color, custom, doubleSingle, rounded, singleDouble
     )
 
 {-| Styles borrowed from <https://www.npmjs.com/package/cli-boxes>
@@ -161,6 +161,39 @@ classic =
         , ( "bottom", "-" )
         , ( "bottomLeft", "+" )
         , ( "left", "|" )
+        ]
+
+
+{-| Design your own box, suash as
+
+•————•
+∫ cm ∫
+•————•
+
+TODO: This may cause issues
+
+-}
+custom :
+    { topLeft : Char
+    , top : Char
+    , topRight : Char
+    , right : Char
+    , bottomRight : Char
+    , bottom : Char
+    , bottomLeft : Char
+    , left : Char
+    }
+    -> Style msg
+custom options =
+    encode
+        [ ( "topLeft", String.fromChar options.topLeft )
+        , ( "top", String.fromChar options.top )
+        , ( "topRight", String.fromChar options.topRight )
+        , ( "right", String.fromChar options.right )
+        , ( "bottomRight", String.fromChar options.bottomRight )
+        , ( "bottom", String.fromChar options.bottom )
+        , ( "bottomLeft", String.fromChar options.bottomLeft )
+        , ( "left", String.fromChar options.left )
         ]
 
 
