@@ -11,6 +11,8 @@
 - [ ] inputs & focus control
   - [ ] buttons
   - [ ] single line text elements
+- [ ] setup text wrapping (npm dep already installed)
+- [ ] setup text truncating (npm dep already installed)
 
 ## Animated Element
 
